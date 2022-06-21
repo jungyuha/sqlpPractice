@@ -1,0 +1,101 @@
+# 오라클 아키텍처 구성
+오라클 아키텍처는 크게 다음과 같이 구성된다.
+- 오라클 인스턴스
+- PGA (각 프로세스만의 공간)
+- 데이터 베이스
+![](https://velog.velcdn.com/images/yooha9621/post/847ed125-311d-4525-bd30-d9c3ee383e0b/image.png)
+
+
+
+# 오라클 인스턴스
+ 오라클 인스턴스는 SGA와 Process로 구성되어있다.
+ [이미지 출처](http://www.gurubee.net/lecture/1084)
+![](https://velog.velcdn.com/images/yooha9621/post/bd6c3a58-1f81-4cc4-a7c6-c2130550a654/image.png)
+
+## SGA(System Global Area)
+- Oracle이 구동을 시작하면 오라클은 기본적으로 SGA라는 메모리 영역을 가장 먼저 할당한다.
+- SGA는 크게 DB 버퍼캐시와 Shared Pool과 Redo Log Buffer로 구성되어있다.
+- SGA는 데이터베이스와 이를 액세스하는 프로세스 사이에의 메모리 캐시 영역이다.
+- SGA는 오라클의 공유 메모리 영역으로 많은 프로세스가 동시에 데이터를 액세스한다.
+때문에 사용자 데이터를 보호하는 Lock과 메모리 액세스를 직렬화 하기 위한 Latch가 필요하다.
+- 디스크 I/O 에 비해 메모리 캐시 I/O 는 매우 빠르다!
+### DB 버퍼캐시 (DB Buffer Cache )
+- 데이터 파일들(Data Files)로부터 읽은 Data Block의 복사본을 담고 있는 영역이다.
+- DB 버퍼캐시는 DBWR(Database Writer Process , 백그라운드 프로세스)에 의해서 관리된다.
+- 수행하는 SQL 문장의 실제 데이터를 메모리에 저장하여 다른 사용자의 동일한 데이터의 요청 시 Disk I/O를 수행하지 않고 메모리상의 데이터를 리턴한다.
+- DB 버퍼캐시는 디스크에 Write하지 않은 수정된 데이터를 보유한다.
+- LRU 알고리즘을 사용하여 가장 오래 전에 사용된것은 DISK로 보내고 가장 최근의 블록을 유지한다.
+> ✅ LRU 알고리즘 
+LRU는 Least Recently Used의 약자로 '가장 최신 데이터 위주로 사용하고자 함' 을 키워드로 둔다.
+메모리에서의 Queuing 알고리즘으로써 LRU(Least Recently Used) 리스트를 사용한다. 사용빈도가 높은 버퍼일수록 더 오래 데이터베이스 버퍼 캐시 내에 존재할 수 있도록 관리하는 알고리즘이다.
+
+- Free Buffer는 서버 프로세스에 할당되어 사용된다.(백그라운드 프로세스가 아님!)
+- Free Buffer가 사용되면 Dirty Buffer가 된다.
+- Dirty Buffer는 DBWR(백그라운드 프로세스)에 의해 디스크에 씌여진 후 다시 Free Buffer가 된다.
+- DB 버퍼캐시는 Dirty List(LRU Write List(LRUW))와 Least Recently Used(LRU) List로 두 개의 List로 구성된다.
+  - Dirty List(LRU Write List(LRUW))란 ?
+    - 수정되어 디스크에 반영되어야 할 블록들의 리스트이다.
+    - Dirty Buffer가 모여있는 곳이다.
+    - 디스크로 쓰여지고 나면 이 Buffer는 Free Mark 되어 다시 사용될 수 있도록 LRU List의 끝부분에 위치한다.
+  - LRU(Least Recently Used) List란?
+    - 최근에 읽은 Datafile Block을 보관한다.
+    - 새로운 Block이 파일에서 읽히면 가장 오래된 버퍼들로부터 메모리에서 없어지도록 관리한다.
+### Shared Pool
+SGA 내 위치한 Shared Pool은 하나의 데이터베이스에 행해지는 모든 SQL 문을 처리하는 데 사용한다.
+#### 라이브러리 캐시 (Library Cache)
+- 사용자가 같은 SQL을 재실행할 때 Hard Parse를 생략하고 Soft Parse 되도록 SQL 정보를 저장하는 곳이다.
+- 라이브러리 캐시는 SQL과 PL/SQL 영역을 저장한다.
+#### 딕셔너리 캐시 (Datadictionary Cache)
+- 데이터베이스 테이블과 뷰에 대한 정보, 구조, 사용자 등에 대한 정보가 저장된다.
+### Redo Log Buffer
+- 데이터베이스에서 일어난 모든 변화를 저장하는 메모리이다.
+- LGWR(백그라운드 프로세스)에 의해 데이터베이스 복구에 사용되는 온라인 리두로그 파일에 버퍼값들을 저장한다.
+- Redo Log Buffer 덕분에 데이터가 COMMIT 되기 전에 먼저 보관이 되어야 어떤 상황에서도 이전 데이터의 복구가 가능하다.
+#### SMON (백그라운드 프로세스)
+- 백그라운드 프로세스 중 하나로 변경 내용을 리두 로그 버퍼에 저장하고 DB Buffer Block에 리두 로그 버퍼 내용을 적용한다.(맞나? 내가 이렇게 적어뒀는데 흠..🤔)
+### Streams Pool
+- 오라클 10g부터 지원하는 메모리 영역으로 다른 DB로 데이터를 전달할 때 사용하는 메모리 영역이다.
+### Large Pool
+- SGA에서 대용량 메모리를 할당할 때 사용되는 메모리 영역이다.
+### Java Pool
+- Oracle JVM에 접속해 있는 모든 세션에서 사용하는 자바코드가 사용하는 메모리 영역이다.
+##  서버 프로세스
+- 사용자 명령을 처리하는 프로세스이다.
+- 서버프로세스에서 블록 단위로 I/O 처리하면 DBWR/CKPT(백그라운드 프로세스)가 주기적으로 캐시-데이터파일 동기화를 수행하도록 한다.
+### Dedicated Server Process(전용 프로세스)
+- 클라이언트를 위한 전용 프로세스이다.
+- 사용자에게 필요한 전용 서비스를 제공한다.
+  - SQL 파싱, 최적화, 실행, 블록 읽기, 읽은 데이터 정렬, 네트워크 전송 등
+- 스스로 처리하지 못하는 일을 만나면 OS, I/O 서브시스템, 백그라운드 프로세스 등에 신호를 보내 대신 일을 처리하도록 요청한다.
+## 백그라운드 프로세스 종류
+### SMON (System Momitor)
+- 오라클 전반적인 시스템을 감시한다.
+- 오라클 인스턴스를 복구한다.
+- 불필요한 임시세그먼트를 정리한다.
+- 변경 내용을 리두 로그 버퍼에 저장하고 DB Buffer Block에 리두 로그 버퍼 내용을 적용한다.
+### PMON (Process Monitor)
+- 이전에 실패한 사용자 프로세스를 정리한다.
+- Lock프로세스 소멸시 Lock을 해제하는 등의 사용자가 사용하고 있는 리소스를 정리한다.
+### DBWR (Database Writer)
+- 데이타 블럭 버퍼 캐쉬와 딕셔너리 캐쉬의 내용을 관리한다.
+- 버퍼캐시(Buffer cache) 내용을 데이터 파일에 저장한다.
+### LGWR (Log Writer)
+- 리두 로그 버퍼의 내용을 온라인 리두 로그파일에 기록한다.
+### CKPT (체크포인트)
+- 마지막 체크포인트 이후에 변경된 모든 블록을 데이터 파일에 쓰도록 유도한다.
+- 체크포인트를 기록하기 위해 데이터 파일 헤더와 컨트롤 파일을 변경한다.
+### ARCH
+- 아카이브 기능을 수행한다.
+# PGA(Program Global Area)
+![](https://velog.velcdn.com/images/yooha9621/post/a92efbf6-798b-40d1-be65-57b883dab307/image.png)
+
+- 유저 프로세스(user process)가 서버 프로세스(sever process)에게 세션(session )을 허락해 달라는 요청을 하면 유저 프로세스(user process)를 처리하기 위한 메모리가 요구되는데 이 때 사용되는 메모리 영역이다.
+- PGA는 인스턴스에 속하지 않는다. 
+# 데이터 베이스
+![](https://velog.velcdn.com/images/yooha9621/post/1d2cc7b6-fdbf-4073-b3c1-a9cbc903e86f/image.png)
+
+- 디스크에 저장된 데이터 집합이다.
+  - Datafile, Redo Log File, Control File...
+    
+*) [참고 출처 1](http://wiki.gurubee.net/pages/viewpage.action?pageId=17530891)
+*) [참고 출처 2](http://bysql.net/w201002)
