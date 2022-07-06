@@ -1,0 +1,65 @@
+# 트랜잭션 수준 읽기 일관성
+- 오라클은 완벽한 문장수준의 읽기 일관성은 보장하나 트랜잭션에 대해서는 기본적으로 보장하지 않는다.
+## 1. 문장수준 읽기 일관성
+- Statement-Level Read Consistency
+- 쿼리가 시작된 시점을 기준으로 테이터를 일관성 있게 읽어들이는 것이다.
+## 2. 트랜잭션 수준 읽기 일관성
+- Transaction-Level Read Consistency
+- 트랜잭션이 시작된 시점을 기준으로 일관성 있게 데이터를 읽어 들이는 것이다.
+## 3. 트랜잭션 고립화 수준
+- ANSI/ISO SQL standard(SQL192)
+### 1) 레벨 0 : Read Uncommitted
+- 트랜잭션에서 처리 중인 아직 커밋되지 않은 테이터를 다른 트랜잭션이 읽는 것을 허용한다.
+- Dirty Read, Non-Repeatable Read, Phantom Read 현상이 발생할 수 있다.
+- 발생 가능한 현상은 다음과 같다.
+  - Dirty read
+  - Non Repeatable read
+  - Phantom read
+### 2) 레벨 1 : Read Committed
+- 대부분의 DBMS가 기본모드로 채택하고 있는 일관성 모드이다.
+- Dirty Read를 방지한다.
+- 트랜잭션이 커밋되어 확정된 테이터만 읽는 것을 허용한다.
+- DB2, SQL Server, Sybase의 경우 읽기 공유 Lock을 이용해서 구현, 하나의 레코드을 읽을 때 Lock을 설정하고 해당 레코드를 빠져 나가는 순간 Lock을 해제한다.
+- Oracle은 Lock을 사용하지 않고 쿼리시작 시점의 Undo 데이터를 제공하는 방식으로 구현한다.
+- 방지할 수 있는 현상은 다음과 같다.
+  - Dirty read
+- 발생가능한 현상은 다음과 같다.
+  - Non Repeatable read
+  - Phantom read
+### 3) 레벨 2 : Repeatable Read
+- 선행 트랜잭션이 읽은 데이터는 트랜잭션이 종료될 때까지 후행 트랜잭션이 갱신하거나 삭제하는 것을 막음으로써 같은 데이터를 두 번 쿼리했을때 일관성 있는 결과를 리턴한다.
+- Phantom Read 현상은 여전히 발생한다.
+- DB2, SQL Server의 경우 트랜잭션 고립화 수준을 Repeatable Read로 변경하면 읽은 데이터에 걸린 공유 Lock을 커밋할 때까지 유지하는 방식으로 구현한다.
+- 방지할 수 있는 현상은 다음과 같다.
+  - Dirty read
+  - Non repeatable read
+- 발생 가능 현상은 다음과 같다.
+  - Phantom read
+#### Oracle에서의 Repeatable Read 구현
+- Repeatable Read 레벨을 명시적으로 지원하지는 않지만 for update 절을 이용해 구현이 가능하다.
+#### SQL Server 등에서의 Repeatable Read 구현
+- for update절을 사용할 수 있지만 커서를 명시적으로 선언할때만 사용이 가능하다.
+
+### 4) h5 레벨 3 : Serializable Read
+- 선행 트랜잭션이 읽은 데이터를 후행 트랜잭션이 갱신하거나 삭제하지 못할 뿐만 아니라 중간에 새로운 레코드를 삽입하는 것도 막아준다.
+- 완벽한 읽기 일관성 모드를 제공한다.
+- 방지할 수 있는 현상은 다음과 같다.
+  - Dirty read
+  - Non repeatable read
+  - phantom read
+## 4. 트랜잭션 레벨 읽기 일관성 설정하기
+```sql
+SET transaction isolation level serializable;
+```
+- commit하면 트랜잭션 단위가 끝이 난다.
+- 트랜잭션 시작 시점의 스냅샷을 보여준다.
+## 5. 낮은 단계의 트랜잭션 고립화 수준을 사용할 때 발생하는 에러
+### 1) Dirty Read(=Uncommitted Dependency)
+- 아직 커밋되지 않은 수정 중인 데이터를 다른 트랜잭션에서 읽을 수 있도록 허용할 때 발생한다.
+- 해당 트랜잭션이 롤백하는 경우 오라클은 다중 버전 읽기 일관성 모델을 채택해 Lock을 사용하지 않고도 Dirty Read를 피해 일관성 있는 데이터 읽기가 가능하다.따라서 트랜잭션 고립화 수준을 레벨 0수준으로 낮추는 방법은 제공하지 않는다.
+### 2) Non-Repeatable Read(= Inconsistent Analysis)
+- 한 트랜잭션 내에서 같은 쿼리를 두 번 수행할 때, 그 사이에 다른 트랜잭션이 값을 수정 또는 삭제함으로써 두 쿼리의 결과가 상이하게 나타는 비 일관성이 발생하는 현상이다.
+### 3) Phantom Read
+- 한 트랜잭션 안에서 일정 범위의 레코드를 두번 이상 읽을 때, 첫번째 쿼리에서 없던 레코드가 두번재 쿼리에서 나타나는 현상이다.
+- 이는 새로운 레코드가 삽입되는 것을 허용하기 때문에 나타나는 현상이다.
+- Phantom Read현상을 방지하려면 트랜잭션 고립화 수준을 레벨3으로 올려 주어야 한다.
