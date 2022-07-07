@@ -86,7 +86,7 @@ where 고객번호 = :cust_num
 and ora_rowscn = :rowscn ;
 
 if sql%rowcount = 0 then alert('다른 사용자에 의해 변경되었습니다.');
-end if;end if;
+end if;
 ```
 - ora_rowscn을 사용하기 위해서 테이블 생성시 ROWDEPENDENCIES 옵션을 사용해야 한다.
 ```sql
