@@ -278,3 +278,53 @@ and 고객ID = cust_id
 
 #### 🍋 기출 포인트
 1. **조건절에 누락된 인덱스 선두 컬럼에 대한 IN 조건절을 추가해 주는 튜닝 기법과 용도는 비슷하지만, 인덱스 스캔 원리는 다르다.** 
+
+### ✍️ 12번 : 활용 가능한 인덱스 스캔 방식
+```
+  ALTER TABLE 고객 ADD CONSTRAINT 고객_PK PRIMARY KEY(고객번호);
+  CREATE INDEX 고객_X01 ON 고객(고객등급, 연령);
+
+  SELECT 고객번호, 고객명, 가입일시, 고객등급, 연령, 연락처
+  FROM 고객
+  WHERE 연령 BETWEEN 20 AND 40
+  ORDER BY 고객번호;
+```
+#### 활용 가능한 인덱스 스캔 방식
+1. **INDEX FULL SCAN** 👉 ⭕️
+1. **INDEX SKIP SCAN** 👉 ⭕️
+#### 활용 가능한 인덱스 스캔 방식 오답
+1. **INDEX RANGE SCAN** 👉 ❌
+1. **INDEX FAST FULL SCAN** 👉 ❌
+
+#### 🍋 기출 포인트
+1. **두 인덱스 모두 선두 컬럼이 조건절에 없으므로 Index Range Scan은 불
+가능하다.** 
+1. **고객등급의 NDV가 적을수록 Skip Scan이 유리하다.** 
+1. **인덱스에 없는 컬럼을 포함하므로 Index Fast Full Scan은 불가능하다.** 
+
+### ✍️ 13번 : 활용 가능한 인덱스 스캔 방식
+```
+  ALTER TABLE 고객 ADD CONSTRAINT 고객_PK PRIMARY KEY(고객번호);
+  CREATE INDEX 고객_XB1 ON 고객(연령, 고객명);
+  
+  SELECT 고객번호, 고객명, 가입일시, 고객등급, 연령, 연락처
+  FROM 고객
+  WHERE 연령 BETWEEN 20 AND 40
+  AND 고객명 = '홍길동'
+  ORDER BY 고객번호;
+```
+#### 활용 가능한 인덱스 스캔 방식
+1. **INDEX RANGE SCAN** 👉 ⭕️
+1. **INDEX FULL SCAN** 👉 ⭕️
+1. **INDEX SKIP SCAN** 👉 ⭕️
+#### 활용 가능한 인덱스 스캔 방식 오답
+1. **INDEX FAST FULL SCAN** 👉 ❌
+
+#### 🍋 기출 포인트
+1. **Index Skip Scan 도 가능하며, 고객 중 동명이인이 거의 없다면 Range Scan 보다 Skip Scan이 유리하다.** 
+
+#### 🍒 문제 해설
+1. **고객_PK를 사용하도록 힌트로 유도하면 고객번호가 조건절에 없으므로 Index Full Scan하게된다.**
+1. **고객_XB1 를 사용하면 선두컬럼인 연령이 조건절에 있으므로 Index Range Scan이 가능하다.**
+1. ****
+
