@@ -1,0 +1,35 @@
+문제링크 : 
+
+# [기존 SQL]
+```sql
+select c.고객번호, c.고객명, t, 평균거래, t.최소거래, t.최대거래
+from 고객 c
+(select 고객번호
+	,avg(거래금액) 평균거래, min(거래금액) 최소거래, max(거래금액) 최대거래
+	from 거래
+	where 거래일시 >= trunc(sysdate, 'mm')
+	group by 고객번호) t
+where c. 가입일시 >= trunc(add_months(sysdate, -1), 'mm')
+and t.고객번호 = c.고객번호;
+```
+
+# [튜닝 SQL]
+```sql
+[인덱스 구성 ]
+고객_PK : 고객번호
+고객_X1 : 가입일시
+거래_PK : 거래번호
+거래_X1 : 거래일시
+거래_X2 : 고객번호 + 거래일시
+
+select /*+ LEADING(c) USE_NL(t) NO_MERGE(t) PUSH_PRED(t)*/
+c.고객번호, c.고객명, t, 평균거래, t.최소거래, t.최대거래
+from 고객 c
+(select 고객번호
+	,avg(거래금액) 평균거래, min(거래금액) 최소거래, max(거래금액) 최대거래
+	from 거래
+	where 거래일시 >= trunc(sysdate, 'mm')
+	group by 고객번호) t
+where c. 가입일시 >= trunc(add_months(sysdate, -1), 'mm')
+and t.고객번호 = c.고객번호;
+```
