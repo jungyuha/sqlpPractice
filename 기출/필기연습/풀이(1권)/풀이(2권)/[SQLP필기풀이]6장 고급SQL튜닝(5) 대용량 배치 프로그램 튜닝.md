@@ -374,3 +374,151 @@ FULL(A) PARALLEL(A 2) LEADING(A) FULL(B) PARALLEL(B 2) USE_HASH(B)
 PQ_DISTRIBUTE(B,HASH,HASH)
 ```
 
+### ✍️ 44번 : 병렬 조인
+#### 양쪽 테이블을 동적으로 해시 파티셔닝한 후에 조인하는 병렬 조인에 대한 설명으로 가장 부적절한 것
+1. **두 개의 서버집합이 필요하다.** 👉 ⭕️
+1. **조인 컬럼의 데이터 분포가 균일하지 않을 때 병렬 처리 효과가 크게 반감된다.** 👉 ⭕️
+1. **두 테이블을 파티셔닝하는 과정에 Temp 테이블스페이스 공간을 많이 사용한다.** 👉 ⭕️
+1. **파티셔닝할 때는 해시 방식을 사용하므로 조인 방식도 해시 조인만 사용할 수 있다.** 👉 ❌
+#### 🍋 기출 포인트
+1. **양쪽 테이블을 동적으로 해시 파티셔닝한 후에 조인하는 병렬 조인은 큰 두 개의 테이블을 조인하는데, 두 테이블 모두 파티션되지 않았거나 서로 다른 기준으로 파티션됐을 때 주로 사용한다.**
+1. **양쪽 모두 큰 테이블일 때 사용하므로 두 테이블을 파티션하는 과정에 많은 Temp 테이블스페이스 공간을 사용한다.**
+1. **파티셔닝할 때는 해시 방식을 사용하지만, 조인 방식은 NL 조민, 소트머지 조인, 해시 조인 중 어떤 것이든 사용할 수 있다.**
+
+### ✍️  45번 : FULL PARTITION WISE JOIN 실행계획
+#### 병렬 조인 실행계획으로 유도하는 힌트를 고르시오.
+  ```sql
+SELECT *
+FROM 주문 A, 주문상품 B
+WHERE ( 이하 생략 )
+  ```
+  ![](https://velog.velcdn.com/images/yooha9621/post/47809215-7fa7-4a4a-80ca-0072bbeadb3e/image.png)
+#### 내 풀이
+- 쿼리 작동 순서
+   - 주문 테이블 Full Scan
+      - 블록 단위 Granule 4개
+      - FULL(A) PARALLEL(A 4) LEADING(A)
+    - 주문상품 테이블 Full Scan
+      - 블록 단위 Granule 4개
+      - FULL(B) PARALLEL(B 4) USE_HASH(B)
+   - 고객,주문 테이블의 데이터를 같은 기준으로 각각 파티셔닝하여 각 범위에 맞게 해시조인 수행
+      - PQ_DISTRIBUTE(B,NONE,NONE)
+#### 답
+```
+FULL(A) PARALLEL(A 4) LEADING(A) FULL(B) PARALLEL(B 4) USE_HASH(B)
+PQ_DISTRIBUTE(B,NONE,NONE)
+```
+#### 🍋 기출 포인트
+1. **⭐️HASH JOIN 오퍼레이션 위쪽에 "PX PARTITION RANGE ALL' 오퍼레이션이 나타난다면 FULL
+PARTITION WISE JOIN 할 때의 실행계획이다.⭐️**
+
+### ✍️  46번 : FULL PARTITION WISE JOIN
+#### FULL PARTITION WISE JOIN에 대한 설명으로 가장 부적절한 것
+1. **파티션 개수보다 작거나 같은 개수의 DOP를 지정해야 한다.** 👉 ⭕️
+1. **테이블 파티션 방식은 Range, List, Hash 어떤 것이든 상관없이 작동한다.** 👉 ⭕️
+1. **조인 방식으로 일반적으로 해시조인을 사용하지만, NL 조인이든 또는 소트머지 조인도 사용할 수 있다.** 👉 ⭕️
+1. **두 개의 서버집합이 필요하다.** 👉 ❌
+#### 🍋 기출 포인트
+1. **다른 병렬 조인은 두 개의 서버집합이 필요한 반면, FULL PARTITION WISE JOIN에서는 하나
+의 서버집합만 필요하다.**
+
+### ✍️  47번 : 
+#### 병렬 조인 실행계획으로 유도하는 힌트를 고르시오.
+  ```sql
+  SELECT *
+FROM 주문 A, 배송 B
+WHERE A.주문번호 = B. 주문번호
+AND A. 주문일자 = B. 주문일자
+AND (이하 생략 )
+  ```
+  ![](https://velog.velcdn.com/images/yooha9621/post/050b320e-0d13-4eb3-842c-8dcb5f83675a/image.png)
+
+#### 내 풀이
+- 쿼리 작동 순서
+   - 주문 테이블 Full Scan
+      - 블록 단위 Granule 4개
+      - FULL(A) PARALLEL(A 4) LEADING(A)
+    - 주문상품 테이블 Full Scan
+      - 블록 단위 Granule 4개
+      - FULL(B) PARALLEL(B 4) USE_HASH(B)
+   - 고객,주문 테이블의 데이터를 같은 기준으로 각각 파티셔닝하여 각 범위에 맞게 해시조인 수행
+      - PQ_DISTRIBUTE(B,NONE,NONE)
+#### 답
+```
+FULL(A) PARALLEL(A 4) LEADING(A) FULL(B) PARALLEL(B 4) USE_HASH(B)
+PQ_DISTRIBUTE(B,NONE,NONE)
+```
+
+### ✍️ 48번 : 
+#### 통계정보를 재수집한 이후에 아래 병렬 쿼리를 실행하는 배치(Batch) 프로그램이 평소보다 오래 걸렸고, 실행계획은 아래와 같았다. 튜닝을 위해 추가해야 할 힌트로 가장 적절한 것은 ?
+```sql
+[ 고객 테이블 ]
+등록 고객 수 = 300만 명
+
+[ 주문 테이블 ]
+월 평균 주문 레코드 = 1,000만 건
+주 파티션 : 주문일자 기준 Range
+서브 파티션 : 고객번호 기준 Hash
+
+SELECT /*+ ORDERED USE_HASH(B) FULL(A) FULL(B) PARALLEL(A 16) PARALLEL(B 16) */
+TO_CHAR(B.주문일시, 'YYYYMMDD') 주문일자, MIN(DISTINCT A.고객번호) 고객수
+, COUNT(*) 주문수량, SUM(B. 주문금액) 주문금액
+FROM 고객 A, 주문 B
+WHERE B.고객번호 = A. 고객번호
+AND B.주문일자 BETWEEN '20200101' AND '20200131'
+AND A.등록일자 < '20200101'
+GROUP BY TO_CHAR(B.주문일시, 'YYYYMMDD')
+ORDER BY 1;
+```
+![](https://velog.velcdn.com/images/yooha9621/post/112b455f-8543-4ee6-92fe-a1c63383b68f/image.png)
+#### 내 풀이
+- 쿼리 작동 순서
+   - 고객 테이블 Full Scan
+      - 블록 단위 Granule 16개
+      - '고객번호'기준 해시 데이터 재분배
+      - FULL(A) PARALLEL(A 16) LEADING(A)
+    - 주문상품 테이블 Full Scan
+      - 블록 단위 Granule 16개
+      - FULL(B) PARALLEL(B 16) USE_HASH(B)
+   - 고객 테이블을 파티셔닝된 주문 데이터에 맞춰 해시 데이터 재분배 후 두번째 서버 프로세스에서 해시조인을 수행한다.왜냐하면 주문 테이블이 고객번호별로 서브 파티셔닝이 되어있기 때문이다.
+      - PQ_DISTRIBUTE(B,PARTITION,NONE)
+#### 답
+```
+PQ_DISTRIBUTE(B,PARTITION,NONE)
+```
+#### 🍋 기출 포인트
+1. **고객 테이블을 Broadcast 하는 것도 고려해 볼 수 있으나, 현재 병렬도가 16인 점을 고려해
+야 한다. 300만 고객 데이터를 16개 병렬 프로세스에 Broadcast 하는 과정에 많은 프로세스간 통신이 발생하고, 메모리 자원이 부족하면 Temp 테이블스페이스를 사용하게 될 수도 있다.**
+
+### ✍️  49번 : 병렬처리
+#### 병렬처리에 대한 설명으로 가장 부적절한 것
+1. **쿼리문에 ROWNUM을 사용하면 병렬 처리 과정에 병목이 발생한다.** 👉 ⭕️
+1. **병렬 DML을 활성화하고 병렬로 INSERT/UPDATE/DELETE 할 때는 별도의 힌트를 지정하지 않아도
+Direct Path Write가 작동한다.** 👉 ⭕️
+1. **파티션 인덱스가 아니면, Index Range Scan, Index Full Scan은 병렬 처리가 불가능하다.** 👉 ⭕️
+1. **NL 조인은 병렬 처리가 불가능하다.** 👉 ❌
+#### 🍋 기출 포인트
+1. **⭐️병렬 DML을 활성화하고 병렬로 INSERT/UPDATE/DELETE 할 때는 별도의 힌트를 지정하지 않아도
+Direct Path Write가 작동한다.⭐️**
+
+### ✍️ 50번 : 병렬처리
+#### 병렬처리를 사용할 때 주의사항으로 가장 부적절한 것
+1. **온라인 트랜잭션을 처리하는 시스템에서는 주간 업무 시간대의 병렬 처리를 제한하거나 최소화해야 한다.** 👉 ⭕️
+1. **온라인 트랜잭션이 발생하는 테이블에 병렬 DML을 사용해선 안 된다.** 👉 ⭕️
+1. **쿼리 틀에서 대량 데이터를 병렬로 조회한 후에 끝까지 Fetch 하지 않았다면,작은 테이블을
+조회하는 쿼리를 수행함으로써 기존 병렬 쿼리의 커서가 닫히도록 조치해야 한다.** 👉 ⭕️
+1. **PARALLEL 힌트를 사용하면 어차피 테이블을 Full Scan 하므로 FULL 힌트를 사용할 필요가 없
+다.** 👉 ❌
+#### 🍋 기출 포인트
+1. **⭐️⭐️**
+1. **병렬 DML 수행 시 Exclusive 모드 테이블 Lock이 걸리므로 업무 트랜잭션이 발생하는 주간
+에 사용하는 것은 금물이다.**
+1. **PARALLEL 힌트를 사용할 때는 FULL 힌트도 함께 사용하는 것이 바람직하다.옵티마이저가
+인덱스 스캔을 선택할 경우 PARALLEL 힌트가 무시됨으로인해 배치 프로그램의 수행 성능이
+평소보다 많이 느려지기 때문이다.**
+1. **parallel_index 힌트를 사용할 때는 반드시 INDEX 또는 INDEX_FFS 힌트를 함께 사용하는 것이 바람직하다.**
+1. **쿼리 틀에서 대량 데이터를 병렬로 조회한 후에 끝까지 Fetch 하지 않고 놔두면, 자원을 해
+제하지 않은 채 프로세스가 계속 더 있게 된다. 따라서 작은 테이블을 조회하는 쿼리를 수
+행함으로써 기존 병렬 쿼리의 커서가 닫히도록 조치하는 것이 바람직하다.**
+
+
