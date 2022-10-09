@@ -29,7 +29,7 @@
   당시 질문을 받은 감독관의 **당황+어처구니 없음**의 표정이 아직도 잊혀지지가 않는다.
   *   **" 시험 1시까지인데요..?;;"**
 
-      <figure><img src="../.gitbook/assets/image.png" alt=""><figcaption><p> <strong>진짜 이런 표정이었음...</strong></p></figcaption></figure>
+      <figure><img src="../.gitbook/assets/image (1).png" alt=""><figcaption><p> <strong>진짜 이런 표정이었음...</strong></p></figcaption></figure>
 
 ## \[3] 응시 후기 <a href="#1" id="1"></a>
 
@@ -64,5 +64,5 @@
 
 #### 결과는..... 합격 👍
 
-<figure><img src="../.gitbook/assets/image (2).png" alt=""><figcaption><p> 제46회 SQL 전문가(SQLP) 합격 </p></figcaption></figure>
+<figure><img src="../.gitbook/assets/image (3).png" alt=""><figcaption><p> 제46회 SQL 전문가(SQLP) 합격 </p></figcaption></figure>
 

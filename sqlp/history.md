@@ -12,7 +12,7 @@
 
 #### 준비 기간 : 2022년 4월 둘째주 \~ 2022년 5월 넷째주 (약 2개월)&#x20;
 
-<figure><img src="../.gitbook/assets/image (3).png" alt=""><figcaption><p> 제45회 SQL 전문가(SQLP) 불합격</p></figcaption></figure>
+<figure><img src="../.gitbook/assets/image (2).png" alt=""><figcaption><p> 제45회 SQL 전문가(SQLP) 불합격</p></figcaption></figure>
 
 ## 2) 두번째 SQLP 시험
 
@@ -26,5 +26,5 @@
 
 #### 준비 기간 : 2022년 7월 첫째주 \~ 2022년 8월 넷째주 (약 2개월)
 
-<figure><img src="../.gitbook/assets/image (1).png" alt=""><figcaption><p>  제46회 SQL 전문가(SQLP) 합격</p></figcaption></figure>
+<figure><img src="../.gitbook/assets/image.png" alt=""><figcaption><p>  제46회 SQL 전문가(SQLP) 합격</p></figcaption></figure>
 

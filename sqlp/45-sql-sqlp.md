@@ -121,7 +121,7 @@ description: 시험 직후 쓴 개인적인 후기..(복기)
 
 #### 결과는...불합격 😂
 
-<figure><img src="../.gitbook/assets/image (3).png" alt=""><figcaption><p> 제45회 SQL 전문가(SQLP) 불합격</p></figcaption></figure>
+<figure><img src="../.gitbook/assets/image (2).png" alt=""><figcaption><p> 제45회 SQL 전문가(SQLP) 불합격</p></figcaption></figure>
 
 한 번에 붙기 어렵다고들 하시더니 직접 경험해보니 정말 맞는 말이었다.
 

@@ -1,16 +1,26 @@
+# \[SQLP실기문제-대량DML튜닝]33번
+
 문제 출처 : SQLP 자격검정 핵심노트2 P.35
-# 문제
+
+## 문제
+
 야간 배치(Batch) 프로그램에서 수행하는 아래 UPDATE 문을 튜닝하고, 정확히 원하는 실행계획이 나오도록 조인 순서와 방식, 인덱스 힌트를 기술하시오. (인덱스 추가 및 변경은 불가)
-## [데이터]
-- 고객 = 100만 명
-- 미성년자(성인여부 = 'N') = 2%
-- 법정대리인을 등록한 미성년자 = 50%
-## [인덱스 구성]
-- 고객_PK : 고객번호
-- 고객_X1 : 고객명
-- 고객_X2 : 연락처
-- 고객_X3 : 법정대리인_고객번호
-## SQL
+
+### \[데이터]
+
+* 고객 = 100만 명
+* 미성년자(성인여부 = 'N') = 2%
+* 법정대리인을 등록한 미성년자 = 50%
+
+### \[인덱스 구성]
+
+* 고객\_PK : 고객번호
+* 고객\_X1 : 고객명
+* 고객\_X2 : 연락처
+* 고객\_X3 : 법정대리인\_고객번호
+
+### SQL
+
 ```sql
 SQL >
 UPDATE 고객 C
@@ -28,5 +38,4 @@ UPDATE STATEMENT Optimizer=ALL_ROWS (Cost=32 Card=14 Bytes=126)
 		TABLE ACCESS (FULL) OF '고객' (TABLE) (Cost=4 Card=14 Bytes=126)
 		TABLE ACCESS (BY INDEX ROWID) OF '고객' (TABLE) (Cost=1 Card=1 Bytes=13)
 			INDEX (UNIQUE SCAN) OF '고객번호_PK' (INDEX (UNIQUE)) (Cost=0 Card=1)
-
 ```
