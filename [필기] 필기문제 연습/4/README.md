@@ -10,7 +10,10 @@
 [2.-and.md](2.-and.md)
 {% endcontent-ref %}
 
-1. NL 조인
-2. 소트 머지 조인 & 해시 조인
-3. 스칼라 서브쿼리&#x20;
-4. 고급 조인 기법
+{% content-ref url="page-2.md" %}
+[page-2.md](page-2.md)
+{% endcontent-ref %}
+
+{% content-ref url="page-1.md" %}
+[page-1.md](page-1.md)
+{% endcontent-ref %}
