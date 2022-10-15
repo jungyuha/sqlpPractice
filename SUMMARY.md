@@ -35,7 +35,7 @@
   * [5. V$SYSSTAT](<\[이론]오라클성능고도화1 정리요약/제 3장 - 오라클 성능 관리/5. V$SYSSTAT.md>)
   * [6. V$SYSTEM\_EVENT](<\[이론]오라클성능고도화1 정리요약/제 3장 - 오라클 성능 관리/6. V$SYSTEM\_EVENT.md>)
   * [7. Response Time Analysis 방법론과 OWI](<\[이론]오라클성능고도화1 정리요약/제 3장 - 오라클 성능 관리/7. Response Time Analysis 방법론과 OWI.md>)
-  * [8. Statspack / AWR](<\[이론]오라클성능고도화1 정리요약/제 3장 - 오라클 성능 관리/8. Statspack / AWR.md>)
+  * [8. Statspack / AWR](<\[이론]오라클성능고도화1 정리요약/제 3장 - 오라클 성능 관리/8. Statspack\_AWR.md>)
   * [9. ASH(Active Session History)](<\[이론]오라클성능고도화1 정리요약/제 3장 - 오라클 성능 관리/9. ASH(Active Session History).md>)
   * [10. V$SQL](<\[이론]오라클성능고도화1 정리요약/제 3장 - 오라클 성능 관리/10. V$SQL.md>)
   * [11 . End-To-End 성능관리](<\[이론]오라클성능고도화1 정리요약/제 3장 - 오라클 성능 관리/11 . End-To-End 성능관리.md>)
