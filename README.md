@@ -16,7 +16,7 @@ description: SQLP 시험 준비 과정에서 공부했던 SQLP 학습 내용을 
 
 #### SQLD 와 SQLP를 준비하면서 개인적으로 작성하면서 매일매일 복습하고 공부했던 학습 문서들을 한꺼번에 정리해놓은 공간입니다.
 
-### 1) 학습 흔적
+### 1) 학습 목록
 
 {% content-ref url="broken-reference" %}
 [Broken link](broken-reference)
