@@ -10,7 +10,7 @@ description: SQLP 시험 준비 과정에서 공부했던 SQLP 학습 내용을 
 
 #### **first Registered : 2022-04**
 
-#### last modified : 2022-09-25 Sun
+#### last modified : 2022-10-27 Thu
 
 ## **\[1] 문서 소개**
 
