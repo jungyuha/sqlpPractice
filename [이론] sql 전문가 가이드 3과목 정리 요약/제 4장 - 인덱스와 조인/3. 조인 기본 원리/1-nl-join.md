@@ -1,12 +1,4 @@
-# 3. 조인 기본 원리
-
-**기록 ✍️**
-
-#### author : jung yuha
-
-#### **first Registered : 2022-04-12**
-
-#### last modified : **2023-04-24**
+# (1) NL Join
 
 ## \[1] Nested Loop Join
 

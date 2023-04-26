@@ -336,4 +336,3 @@
 * 관련 파라미터명 : \_db\_block\_max\_cr\_dba
 * CR Copy 는 LRU 리스트에서 LRU End 쪽에 위치한다.
 
-****
