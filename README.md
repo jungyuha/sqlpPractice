@@ -10,13 +10,17 @@ description: SQLP 시험 준비 과정에서 공부했던 SQLP 학습 내용을 
 
 #### **first Registered : 2022-04**
 
-#### last modified : 2022-10-27 Thu
+#### last modified : 2023-05-07
 
 ## **\[1] 문서 소개**
 
 #### SQLD 와 SQLP를 준비하면서 개인적으로 작성하면서 매일매일 복습하고 공부했던 학습 문서들을 한꺼번에 정리해놓은 공간입니다.
 
 ### 1) 학습 목록
+
+{% content-ref url="broken-reference" %}
+[Broken link](broken-reference)
+{% endcontent-ref %}
 
 {% content-ref url="broken-reference" %}
 [Broken link](broken-reference)
